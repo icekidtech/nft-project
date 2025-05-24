@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
 import '@rainbow-me/rainbowkit/styles.css';
+import { injectedWallet, metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
 
 // Configure Lisk Sepolia testnet as a custom chain
 const liskSepolia = {
@@ -31,18 +32,19 @@ const liskSepolia = {
   testnet: true,
 } as const;
 
-// Create wallet connectors
-const { wallets } = getDefaultWallets({
-  appName: 'AstralPackLegends',
-  projectId: '2838d376974238512f245e6198aa9b43',
-  chains: [liskSepolia]
-});
+// Project ID from WalletConnect
+const projectId = '2838d376974238512f245e6198aa9b43';
 
-// Create connectors array from wallets
-const connectors = connectorsForWallets(wallets, {
-  projectId: '2838d376974238512f245e6198aa9b43',
-  appName: 'AstralPackLegends',
-});
+// Create wallet connectors - corrected implementation for rainbowkit
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      injectedWallet({ chains: [liskSepolia], projectId }),
+      metaMaskWallet({ chains: [liskSepolia], projectId })
+    ],
+  },
+]);
 
 // Create wagmi config
 const wagmiConfig = createConfig({
@@ -61,7 +63,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          chains={[liskSepolia]}
           theme={darkTheme({
             accentColor: '#cc00ff',
             accentColorForeground: 'white',
