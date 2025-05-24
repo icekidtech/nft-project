@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { motion, AnimatePresence } from 'framer-motion';
 import Home from './pages/Home';
 import Mint from './pages/Mint';
+import { formatAddress } from './utils/contract';
+import { Home as HomeIcon } from 'lucide-react';
 
 // Footer component
 const Footer = () => (
@@ -26,6 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
 function App() {
   const { isConnected, address } = useAccount();
   const [mounted, setMounted] = useState(false);
+  const location = useLocation();
 
   // Fix hydration issues
   useEffect(() => {
@@ -45,29 +49,46 @@ function App() {
             AstralPackLegends
           </h1>
         </div>
-        <div className="flex items-center space-x-4">
-          {isConnected && (
+        
+        <div className="flex items-center gap-4">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <a 
+              href="/"
+              className="text-white/70 hover:text-white transition-colors p-2 rounded-full hover:bg-space-light/20"
+              aria-label="Home"
+            >
+              <HomeIcon size={20} />
+            </a>
+          </motion.div>
+          
+          {isConnected && address && (
             <span className="hidden md:inline-block text-astral-gold text-sm">
-              {address && `Connected: ${address.substring(0, 6)}...${address.substring(address.length - 4)}`}
+              {formatAddress(address)}
             </span>
           )}
+          
           <ConnectButton showBalance={false} />
         </div>
       </header>
 
       <main className="flex-grow container mx-auto px-4 py-8">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route 
-            path="/mint" 
-            element={
-              <ProtectedRoute>
-                <Mint />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route 
+              path="/mint" 
+              element={
+                <ProtectedRoute>
+                  <Mint />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AnimatePresence>
       </main>
 
       <Footer />
