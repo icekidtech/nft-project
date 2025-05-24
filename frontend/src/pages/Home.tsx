@@ -4,29 +4,31 @@ import { useAccount } from 'wagmi';
 import { usePublicClient } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
-import { 
-  getContract, 
-  fetchNFTMetadata, 
-  type NFTMetadata 
-} from '../utils/contract';
+import { getContract, CONTRACT_ADDRESS } from '../utils/contract';
 import { motion } from 'framer-motion';
-import { RocketIcon, Star, Info } from 'lucide-react';
+import { Rocket, Star, Info } from 'lucide-react';
 import NFTCard from '../components/NFTCard';
 
 const Home = () => {
   const publicClient = usePublicClient();
   const { isConnected } = useAccount();
-  const [remainingNFTs, setRemainingNFTs] = useState<number>(0);
+  
+  const [remainingNFTs, setRemainingNFTs] = useState<number>(104);
   const [totalSupply] = useState<number>(104);
   const [randomTokenIds, setRandomTokenIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchContractData = async () => {
       setIsLoading(true);
+      setLoadingError(null);
+      
       try {
-        // Use publicClient here
+        // Use publicClient to get the contract data
         const contract = getContract(publicClient as unknown as ethers.Provider);
+        
+        // Get unminted tokens
         const unmintedTokens = await contract.getUnmintedTokens();
         setRemainingNFTs(unmintedTokens.length);
         
@@ -46,8 +48,9 @@ const Home = () => {
         const selected = shuffled.slice(0, 5);
         
         setRandomTokenIds(selected);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching contract data:", error);
+        setLoadingError(error.message || "Failed to load contract data");
         // Set default values for demo purposes
         setRandomTokenIds([5, 10, 30, 82, 92]);
       } finally {
@@ -76,6 +79,11 @@ const Home = () => {
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 }
+  };
+
+  const handleRetry = () => {
+    setLoadingError(null);
+    // Will trigger effect to reload
   };
 
   return (
@@ -118,30 +126,51 @@ const Home = () => {
           >
             <Link to="/mint" className="btn-primary inline-flex items-center text-glow">
               <span>Go to Minting</span>
-              <RocketIcon className="ml-2 h-5 w-5" />
+              <Rocket className="ml-2 h-5 w-5" />
             </Link>
           </motion.div>
         )}
       </motion.div>
       
-      <motion.div className="mb-12" variants={itemVariants}>
-        <h2 className="text-2xl font-bold mb-6 text-center cosmic-header flex items-center justify-center">
-          <Star className="mr-2 text-astral-gold" />
-          Featured Astral Legends
-          <Star className="ml-2 text-astral-gold" />
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {randomTokenIds.map((tokenId, index) => (
-            <motion.div 
-              key={tokenId}
-              variants={itemVariants}
-              transition={{ delay: index * 0.1 }}
-            >
-              <NFTCard tokenId={tokenId} isLoading={isLoading} />
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      {loadingError ? (
+        <motion.div className="card text-center py-10" variants={itemVariants}>
+          <div className="text-red-400 mb-4">
+            <AlertCircle size={40} className="mx-auto mb-2" />
+            <p>{loadingError}</p>
+          </div>
+          <button 
+            onClick={handleRetry}
+            className="btn-primary mt-4 inline-flex items-center"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" /> 
+            Retry Loading
+          </button>
+        </motion.div>
+      ) : (
+        <motion.div className="mb-12" variants={itemVariants}>
+          <h2 className="text-2xl font-bold mb-6 text-center cosmic-header flex items-center justify-center">
+            <Star className="mr-2 text-astral-gold" />
+            Featured Astral Legends
+            <Star className="ml-2 text-astral-gold" />
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {randomTokenIds.map((tokenId, index) => (
+              <motion.div 
+                key={tokenId}
+                variants={itemVariants}
+                transition={{ delay: index * 0.1 }}
+              >
+                <NFTCard 
+                  tokenId={tokenId} 
+                  isLoading={isLoading} 
+                  contractAddress={CONTRACT_ADDRESS}
+                  onRetry={handleRetry}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
       
       <motion.div 
         className="card text-center my-12"
