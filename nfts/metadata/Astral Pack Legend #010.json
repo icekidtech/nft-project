@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #010",
+    "description": "A radiant construct bathed in azure hues, emerging from a galactic rift of cosmic chaos.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #010.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 10
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

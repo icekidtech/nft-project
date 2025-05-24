@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #030",
+    "description": "A neon crystal forged in a supernova remnant, shimmering with lunar mist of celestial origin.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #030.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 30
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

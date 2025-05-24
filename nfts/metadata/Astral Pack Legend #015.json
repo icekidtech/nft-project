@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #015",
+    "description": "A celestial crystal glowing with azure light, guarding a celestial abyss of cosmic secrets.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #015.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 15
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

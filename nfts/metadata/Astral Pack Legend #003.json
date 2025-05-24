@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #003",
+    "description": "A ruby entity pulsating with solar flares, floating amidst a cosmic storm of ethereal energy.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #003.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 3
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

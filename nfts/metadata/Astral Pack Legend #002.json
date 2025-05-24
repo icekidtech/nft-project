@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #002",
+    "description": "A ruby construct pulsating with lunar mist, floating amidst a star cluster of ethereal energy.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #002.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 2
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

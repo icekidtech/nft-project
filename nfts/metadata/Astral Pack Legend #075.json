@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #075",
+    "description": "A majestic relic cloaked in ruby stardust, reigning over a nebula of galactic wonder.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #075.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 75
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

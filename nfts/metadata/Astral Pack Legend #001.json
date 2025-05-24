@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #001",
+    "description": "A majestic orb cloaked in ruby stardust, reigning over a nebula of galactic wonder.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #001.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 1
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

@@ -1,0 +1,284 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { 
+  getContract, 
+  fetchNFTMetadata, 
+  getImageUrl,
+  formatAddress
+} from '../utils/contract';
+import { ethers } from 'ethers';
+
+// Status enum
+const MINT_STATUS = {
+  IDLE: 'idle',
+  LOADING: 'loading',
+  SUCCESS: 'success',
+  ERROR: 'error'
+} as const;
+
+type MintStatusType = typeof MINT_STATUS[keyof typeof MINT_STATUS];
+
+const Mint = () => {
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
+  
+  const [remainingNFTs, setRemainingNFTs] = useState<number>(0);
+  const [mintStatus, setMintStatus] = useState<MintStatusType>(MINT_STATUS.IDLE);
+  const [txHash, setTxHash] = useState<string>('');
+  const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
+  const [mintedMetadata, setMintedMetadata] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  
+  // Fetch contract data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const contract = getContract(publicClient as unknown as ethers.Provider);
+        const unmintedTokens = await contract.getUnmintedTokens();
+        setRemainingNFTs(unmintedTokens.length);
+      } catch (error) {
+        console.error("Error fetching contract data:", error);
+        setErrorMessage("Couldn't load contract data. Please try again later.");
+      }
+    };
+
+    fetchData();
+    
+    // Refresh every 10 seconds
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval);
+  }, [publicClient, mintStatus]);
+  
+  // Fetch metadata for minted token
+  useEffect(() => {
+    const fetchMintedMetadata = async () => {
+      if (mintedTokenId) {
+        try {
+          const metadata = await fetchNFTMetadata(mintedTokenId);
+          setMintedMetadata(metadata);
+        } catch (error) {
+          console.error("Error fetching minted token metadata:", error);
+        }
+      }
+    };
+    
+    fetchMintedMetadata();
+  }, [mintedTokenId]);
+  
+  const handleMint = async () => {
+    if (!walletClient) {
+      setErrorMessage("Please connect your wallet first");
+      return;
+    }
+    
+    setMintStatus(MINT_STATUS.LOADING);
+    setErrorMessage('');
+    
+    try {
+      // Create a signer from walletClient
+      const provider = new ethers.BrowserProvider(walletClient as any);
+      const signer = await provider.getSigner();
+      const contract = getContract(signer);
+      
+      // Check if there are tokens left
+      const unmintedTokens = await contract.getUnmintedTokens();
+      if (unmintedTokens.length === 0) {
+        throw new Error("All tokens have been minted!");
+      }
+      
+      // Execute the mint transaction
+      const tx = await contract.mintRandomNFT();
+      setTxHash(tx.hash);
+      
+      // Wait for transaction to be mined
+      console.log("Waiting for transaction to be mined...");
+      const receipt = await tx.wait();
+      
+      // Extract the token ID from the NFTMinted event
+      if (receipt && receipt.logs) {
+        const event = receipt.logs.find(
+          (log: any) => 'fragment' in log && log.fragment && log.fragment.name === 'NFTMinted'
+        );
+        
+        if (event && 'args' in event) {
+          setMintedTokenId(Number(event.args[1]));
+          setMintStatus(MINT_STATUS.SUCCESS);
+        } else {
+          throw new Error("Couldn't find the minted token ID");
+        }
+      } else {
+        throw new Error("Transaction was processed but couldn't extract token ID");
+      }
+    } catch (error: any) {
+      console.error("Error minting NFT:", error);
+      setMintStatus(MINT_STATUS.ERROR);
+      
+      // Provide a user-friendly error message
+      if (error.message.includes("user rejected transaction")) {
+        setErrorMessage("Transaction was rejected in your wallet");
+      } else if (error.message.includes("insufficient funds")) {
+        setErrorMessage("Insufficient funds for gas * price + value");
+      } else {
+        setErrorMessage(error.message || "An unknown error occurred");
+      }
+    }
+  };
+  
+  const equalsMintStatus = (a: MintStatusType, b: MintStatusType) => a === b;
+  
+  // Render different content based on mint status
+  const renderContent = () => {
+    switch (mintStatus) {
+      case MINT_STATUS.LOADING:
+        return (
+          <div className="text-center p-8">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-astral-blue mb-4"></div>
+            <p className="text-xl">Transaction in progress...</p>
+            {txHash && (
+              <a 
+                href={`https://sepolia-blockscout.lisk.com/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-astral-blue hover:underline mt-2 inline-block"
+              >
+                View on Explorer
+              </a>
+            )}
+          </div>
+        );
+        
+      case MINT_STATUS.SUCCESS:
+        return (
+          <div className="text-center p-8">
+            <div className="mb-6 bg-astral-purple/20 border border-astral-purple rounded-lg p-6 inline-block">
+              <div className="w-24 h-24 mx-auto mb-4 text-5xl bg-astral-gold/20 rounded-full flex items-center justify-center">
+                🎉
+              </div>
+              <h3 className="text-2xl font-bold mb-2 cosmic-header">
+                Congratulations!
+              </h3>
+              <p className="text-lg">
+                You minted token <span className="font-bold text-astral-gold">#{mintedTokenId}</span>
+              </p>
+            </div>
+            
+            {mintedMetadata && (
+              <div className="mb-6">
+                <div className="nft-card aspect-square max-w-xs mx-auto">
+                  <div className="h-3/4 overflow-hidden">
+                    <img 
+                      src={getImageUrl(mintedMetadata.image)} 
+                      alt={mintedMetadata.name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/400x400/1a1e3a/cc00ff?text=Astral+NFT';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-astral-gold truncate">{mintedMetadata.name}</h3>
+                    <p className="text-xs text-white/70 truncate">{mintedMetadata.description.substring(0, 60)}...</p>
+                  </div>
+                </div>
+                <a 
+                  href={`https://sepolia-blockscout.lisk.com/token/${getContract(publicClient as unknown as ethers.Provider).target}/instance/${mintedTokenId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-astral-blue hover:underline mt-4 inline-block"
+                >
+                  View on Explorer
+                </a>
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+              <button 
+                onClick={() => setMintStatus(MINT_STATUS.IDLE)} 
+                className="btn-primary"
+              >
+                Mint Another
+              </button>
+              <Link to="/" className="btn-secondary">
+                Back to Home
+              </Link>
+            </div>
+          </div>
+        );
+        
+      case MINT_STATUS.ERROR:
+        return (
+          <div className="text-center p-8">
+            <div className="w-16 h-16 mx-auto mb-4 text-3xl bg-red-500/20 rounded-full flex items-center justify-center">
+              ❌
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-red-400">
+              Minting Failed
+            </h3>
+            <p className="text-white/80 mb-6">
+              {errorMessage || "Something went wrong. Please try again."}
+            </p>
+            <button 
+              onClick={() => setMintStatus(MINT_STATUS.IDLE)} 
+              className="btn-primary"
+            >
+              Try Again
+            </button>
+          </div>
+        );
+        
+      default:
+        return (
+          <div className="text-center p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2 cosmic-header">
+                Ready to Mint?
+              </h3>
+              <p className="text-white/80 mb-4">
+                Clicking the button below will initiate a transaction to mint a random Astral Pack Legend NFT.
+              </p>
+              <div className="bg-space-mid/40 backdrop-blur-sm p-4 rounded-xl border border-astral-blue/30 inline-block mb-6">
+                <p className="text-lg">
+                  Remaining NFTs: <span className="text-astral-gold font-bold">{remainingNFTs}</span> out of 104
+                </p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleMint} 
+              className="btn-primary text-xl py-4 px-10 text-glow"
+              disabled={equalsMintStatus(mintStatus, MINT_STATUS.LOADING) || remainingNFTs === 0}
+            >
+              {remainingNFTs > 0 ? "Mint Random NFT" : "All NFTs Minted"}
+            </button>
+            
+            {errorMessage && (
+              <p className="text-red-400 mt-4">{errorMessage}</p>
+            )}
+          </div>
+        );
+    }
+  };
+  
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-glow cosmic-header">
+          Mint Your Astral Pack Legend
+        </h1>
+        {address && (
+          <p className="text-astral-blue mb-2">
+            Connected: {formatAddress(address)}
+          </p>
+        )}
+      </div>
+      
+      <div className="card">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+export default Mint;

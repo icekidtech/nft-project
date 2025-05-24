@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #078",
+    "description": "A violet entity forged in a cosmic storm, shimmering with plasma of celestial origin.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #078.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 78
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

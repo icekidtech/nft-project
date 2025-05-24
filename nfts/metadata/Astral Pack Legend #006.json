@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #006",
+    "description": "A mystical relic aglow with neon essence, drifting through a cosmic horizon of nebulae.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #006.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 6
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #008",
+    "description": "A indigo beacon forged in a astral sea, shimmering with ether of celestial origin.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #008.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 8
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

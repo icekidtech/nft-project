@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #069",
+    "description": "A majestic construct cloaked in obsidian stardust, reigning over a void expanse of galactic wonder.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #069.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 69
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

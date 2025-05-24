@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #023",
+    "description": "A indigo amulet imbued with cosmic fire, standing sentinel in a celestial abyss of cosmic void.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #023.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 23
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}

@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-start: #0a0c1a;
+  --background-mid: #1a1e3a;
+  --background-end: #2a2e5a;
+}
+
+body {
+  @apply font-space bg-gradient-to-b from-space-dark via-space-mid to-space-light min-h-screen text-white bg-stars bg-fixed;
+  margin: 0;
+  padding: 0;
+}
+
+.text-glow {
+  @apply animate-glow;
+}
+
+.card {
+  @apply bg-space-mid/40 backdrop-blur-sm rounded-xl p-6 border border-astral-purple/30 shadow-lg;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-astral-blue to-astral-purple text-white font-bold py-3 px-6 rounded-full 
+  shadow-lg hover:shadow-astral-blue/50 active:translate-y-0.5 transition-all duration-300 
+  border border-white/10 relative overflow-hidden;
+}
+
+.btn-primary:after {
+  content: '';
+  @apply absolute inset-0 rounded-full bg-white/20 opacity-0 transition-opacity duration-300;
+}
+
+.btn-primary:hover:after {
+  @apply opacity-100;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-space-light to-astral-purple/50 text-white font-bold py-3 px-6 rounded-full
+  shadow-md hover:shadow-astral-purple/30 transition-all duration-300
+  border border-white/10;
+}
+
+.nft-card {
+  @apply bg-gradient-to-b from-space-dark/80 via-space-mid/60 to-space-light/40 
+  backdrop-blur-md rounded-xl overflow-hidden border border-astral-purple/20
+  hover:border-astral-gold/50 transition-all duration-300
+  shadow-lg shadow-space-dark/80 h-[360px];
+}
+
+.nft-card:hover {
+  @apply shadow-astral-blue/20;
+}
+
+.cosmic-header {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-astral-gold via-astral-purple to-astral-blue font-bold;
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-astral-blue;
+}

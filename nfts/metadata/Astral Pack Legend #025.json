@@ -1,0 +1,15 @@
+{
+    "name": "Astral Pack Legend #025",
+    "description": "A amethyst entity forged in a nebula, shimmering with solar flares of celestial origin.",
+    "image": "ipfs://bafybeide2nutnh2sgayr5tdy6z2znf6dm226mcxeqowkbijghsdssv75te/Astral Pack Legends #025.jpg",
+    "attributes": [
+        {
+            "trait_type": "Number",
+            "value": 25
+        },
+        {
+            "trait_type": "Theme",
+            "value": "Cosmic Fantasy"
+        }
+    ]
+}
