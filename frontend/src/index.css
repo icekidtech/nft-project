@@ -6,58 +6,93 @@
   --background-start: #0a0c1a;
   --background-mid: #1a1e3a;
   --background-end: #2a2e5a;
+  --astral-blue: #00ccff;
+  --astral-purple: #cc00ff;
+  --astral-gold: #ffd700;
 }
 
-body {
-  @apply font-space bg-gradient-to-b from-space-dark via-space-mid to-space-light min-h-screen text-white bg-stars bg-fixed;
-  margin: 0;
-  padding: 0;
+@layer base {
+  body {
+    @apply font-space bg-gradient-to-b from-space-dark via-space-mid to-space-light min-h-screen text-white;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+  }
 }
 
+/* Starry background effect */
+.bg-stars {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.15) 1px,
+    transparent 0
+  );
+  background-size: 50px 50px;
+}
+
+/* Text glow effect */
 .text-glow {
-  @apply animate-glow;
+  text-shadow: 0 0 10px var(--astral-blue), 0 0 20px var(--astral-purple);
 }
 
-.card {
-  @apply bg-space-mid/40 backdrop-blur-sm rounded-xl p-6 border border-astral-purple/30 shadow-lg;
+@layer components {
+  .card {
+    @apply bg-space-mid/40 backdrop-blur-sm rounded-xl p-6 border border-astral-purple/30 shadow-lg;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-astral-blue to-astral-purple text-white font-bold py-3 px-6 rounded-full 
+    shadow-lg hover:shadow-astral-blue/50 active:translate-y-0.5 transition-all duration-300 
+    border border-white/10 relative overflow-hidden disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary:after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-white/20 opacity-0 transition-opacity duration-300;
+  }
+
+  .btn-primary:hover:after {
+    @apply opacity-100;
+  }
+
+  .btn-secondary {
+    @apply bg-gradient-to-r from-space-light to-astral-purple/50 text-white font-bold py-3 px-6 rounded-full
+    shadow-md hover:shadow-astral-purple/30 transition-all duration-300
+    border border-white/10;
+  }
+
+  .nft-card {
+    @apply bg-gradient-to-b from-space-dark/80 via-space-mid/60 to-space-light/40 
+    backdrop-blur-md rounded-xl overflow-hidden border border-astral-purple/20
+    hover:border-astral-gold/50 transition-all duration-300
+    shadow-lg shadow-space-dark/80 h-[360px];
+  }
+
+  .nft-card:hover {
+    @apply shadow-astral-blue/20;
+  }
+
+  .cosmic-header {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-astral-gold via-astral-purple to-astral-blue font-bold;
+  }
 }
 
-.btn-primary {
-  @apply bg-gradient-to-r from-astral-blue to-astral-purple text-white font-bold py-3 px-6 rounded-full 
-  shadow-lg hover:shadow-astral-blue/50 active:translate-y-0.5 transition-all duration-300 
-  border border-white/10 relative overflow-hidden;
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
-.btn-primary:after {
-  content: '';
-  @apply absolute inset-0 rounded-full bg-white/20 opacity-0 transition-opacity duration-300;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
-.btn-primary:hover:after {
-  @apply opacity-100;
+@keyframes glow {
+  0% { filter: drop-shadow(0 0 2px var(--astral-blue)); }
+  50% { filter: drop-shadow(0 0 8px var(--astral-purple)); }
+  100% { filter: drop-shadow(0 0 2px var(--astral-blue)); }
 }
 
-.btn-secondary {
-  @apply bg-gradient-to-r from-space-light to-astral-purple/50 text-white font-bold py-3 px-6 rounded-full
-  shadow-md hover:shadow-astral-purple/30 transition-all duration-300
-  border border-white/10;
-}
-
-.nft-card {
-  @apply bg-gradient-to-b from-space-dark/80 via-space-mid/60 to-space-light/40 
-  backdrop-blur-md rounded-xl overflow-hidden border border-astral-purple/20
-  hover:border-astral-gold/50 transition-all duration-300
-  shadow-lg shadow-space-dark/80 h-[360px];
-}
-
-.nft-card:hover {
-  @apply shadow-astral-blue/20;
-}
-
-.cosmic-header {
-  @apply text-transparent bg-clip-text bg-gradient-to-r from-astral-gold via-astral-purple to-astral-blue font-bold;
-}
-
-.loading-spinner {
-  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-astral-blue;
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
 }
