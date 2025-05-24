@@ -23,6 +23,11 @@ export default defineConfig({
         target: 'https://gateway.pinata.cloud',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/pinata/, ''),
+      },
+      '/cloudflare': {
+        target: 'https://cloudflare-ipfs.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/cloudflare/, ''),
       }
     }
   }
