@@ -5,9 +5,19 @@ import {
   getContract, 
   fetchNFTMetadata, 
   getImageUrl,
-  formatAddress
+  formatAddress,
+  CONTRACT_ADDRESS
 } from '../utils/contract';
 import { ethers } from 'ethers';
+import { motion } from 'framer-motion';
+import { 
+  Loader, 
+  AlertCircle, 
+  CheckCircle2, 
+  ArrowLeft, 
+  ExternalLink,
+  RefreshCw
+} from 'lucide-react';
 
 // Status enum
 const MINT_STATUS = {
@@ -31,6 +41,13 @@ const Mint = () => {
   const [mintedMetadata, setMintedMetadata] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   
+  // Page animation variants
+  const pageVariants = {
+    initial: { opacity: 0, x: -20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 20 }
+  };
+  
   // Fetch contract data
   useEffect(() => {
     const fetchData = async () => {
@@ -46,8 +63,13 @@ const Mint = () => {
 
     fetchData();
     
-    // Refresh every 10 seconds
-    const interval = setInterval(fetchData, 10000);
+    // Refresh every 10 seconds if idle
+    const interval = setInterval(() => {
+      if (mintStatus === MINT_STATUS.IDLE) {
+        fetchData();
+      }
+    }, 10000);
+    
     return () => clearInterval(interval);
   }, [publicClient, mintStatus]);
   
@@ -116,9 +138,9 @@ const Mint = () => {
       setMintStatus(MINT_STATUS.ERROR);
       
       // Provide a user-friendly error message
-      if (error.message.includes("user rejected transaction")) {
+      if (error.message && error.message.includes("user rejected transaction")) {
         setErrorMessage("Transaction was rejected in your wallet");
-      } else if (error.message.includes("insufficient funds")) {
+      } else if (error.message && error.message.includes("insufficient funds")) {
         setErrorMessage("Insufficient funds for gas * price + value");
       } else {
         setErrorMessage(error.message || "An unknown error occurred");
@@ -134,16 +156,23 @@ const Mint = () => {
       case MINT_STATUS.LOADING:
         return (
           <div className="text-center p-8">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-astral-blue mb-4"></div>
-            <p className="text-xl">Transaction in progress...</p>
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+              className="inline-block mb-4"
+            >
+              <Loader size={48} className="text-astral-blue" />
+            </motion.div>
+            <p className="text-xl mb-4">Transaction in progress...</p>
             {txHash && (
               <a 
                 href={`https://sepolia-blockscout.lisk.com/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-astral-blue hover:underline mt-2 inline-block"
+                className="text-astral-blue hover:underline mt-2 inline-flex items-center"
               >
-                View on Explorer
+                <span>View on Explorer</span>
+                <ExternalLink size={16} className="ml-1" />
               </a>
             )}
           </div>
@@ -154,7 +183,7 @@ const Mint = () => {
           <div className="text-center p-8">
             <div className="mb-6 bg-astral-purple/20 border border-astral-purple rounded-lg p-6 inline-block">
               <div className="w-24 h-24 mx-auto mb-4 text-5xl bg-astral-gold/20 rounded-full flex items-center justify-center">
-                🎉
+                <CheckCircle2 size={48} className="text-green-400" />
               </div>
               <h3 className="text-2xl font-bold mb-2 cosmic-header">
                 Congratulations!
@@ -173,22 +202,26 @@ const Mint = () => {
                       alt={mintedMetadata.name} 
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/400x400/1a1e3a/cc00ff?text=Astral+NFT';
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://placehold.co/400x400/1a1e3a/cc00ff?text=Astral+NFT';
                       }}
                     />
                   </div>
                   <div className="p-4">
                     <h3 className="font-bold text-astral-gold truncate">{mintedMetadata.name}</h3>
-                    <p className="text-xs text-white/70 truncate">{mintedMetadata.description.substring(0, 60)}...</p>
+                    <p className="text-xs text-white/70 truncate">
+                      {mintedMetadata.description && mintedMetadata.description.substring(0, 60)}...
+                    </p>
                   </div>
                 </div>
                 <a 
-                  href={`https://sepolia-blockscout.lisk.com/token/${getContract(publicClient as unknown as ethers.Provider).target}/instance/${mintedTokenId}`}
+                  href={`https://sepolia-blockscout.lisk.com/token/${CONTRACT_ADDRESS}/instance/${mintedTokenId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-astral-blue hover:underline mt-4 inline-block"
+                  className="text-astral-blue hover:underline mt-4 inline-flex items-center"
                 >
-                  View on Explorer
+                  <span>View on Explorer</span>
+                  <ExternalLink size={16} className="ml-1" />
                 </a>
               </div>
             )}
@@ -200,7 +233,8 @@ const Mint = () => {
               >
                 Mint Another
               </button>
-              <Link to="/" className="btn-secondary">
+              <Link to="/" className="btn-secondary inline-flex items-center justify-center">
+                <ArrowLeft size={16} className="mr-1" />
                 Back to Home
               </Link>
             </div>
@@ -210,21 +244,22 @@ const Mint = () => {
       case MINT_STATUS.ERROR:
         return (
           <div className="text-center p-8">
-            <div className="w-16 h-16 mx-auto mb-4 text-3xl bg-red-500/20 rounded-full flex items-center justify-center">
-              ❌
+            <div className="mb-6">
+              <AlertCircle size={48} className="mx-auto mb-4 text-red-400" />
+              <h3 className="text-xl font-bold mb-2 text-red-400">
+                Minting Failed
+              </h3>
+              <p className="text-white/80 mb-6">
+                {errorMessage || "Something went wrong. Please try again."}
+              </p>
+              <button 
+                onClick={() => setMintStatus(MINT_STATUS.IDLE)} 
+                className="btn-primary inline-flex items-center"
+              >
+                <RefreshCw size={16} className="mr-2" />
+                Try Again
+              </button>
             </div>
-            <h3 className="text-xl font-bold mb-2 text-red-400">
-              Minting Failed
-            </h3>
-            <p className="text-white/80 mb-6">
-              {errorMessage || "Something went wrong. Please try again."}
-            </p>
-            <button 
-              onClick={() => setMintStatus(MINT_STATUS.IDLE)} 
-              className="btn-primary"
-            >
-              Try Again
-            </button>
           </div>
         );
         
@@ -262,7 +297,14 @@ const Mint = () => {
   };
   
   return (
-    <div className="max-w-3xl mx-auto">
+    <motion.div 
+      className="max-w-3xl mx-auto"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ type: "tween", duration: 0.3 }}
+    >
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-glow cosmic-header">
           Mint Your Astral Pack Legend
@@ -277,7 +319,7 @@ const Mint = () => {
       <div className="card">
         {renderContent()}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
