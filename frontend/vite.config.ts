@@ -11,5 +11,19 @@ export default defineConfig({
   },
   define: {
     'process.env': {}
+  },
+  server: {
+    proxy: {
+      '/ipfs': {
+        target: 'https://ipfs.io',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ipfs/, ''),
+      },
+      '/pinata': {
+        target: 'https://gateway.pinata.cloud',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/pinata/, ''),
+      }
+    }
   }
 });
